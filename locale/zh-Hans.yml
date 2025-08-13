@@ -11,6 +11,7 @@ wusong8899-transfer-money:
     transfer-list-transfer-notes: 附言
     transfer-list-transfer-notes-none: 无
     transfer-money: 转账
+    withdrawal: 提现
     transfer-money-to-user: 转账给用户（点击移除已添加用户）
     transfer-money-no-user-selected: 还未添加用户
     transfer-money-search-user: 添加用户

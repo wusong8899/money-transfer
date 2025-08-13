@@ -11,6 +11,7 @@ wusong8899-transfer-money:
     transfer-list-transfer-notes: Notes
     transfer-list-transfer-notes-none: None
     transfer-money: Transfer Money
+    withdrawal: Withdrawal
     transfer-money-to-user: Transfer money to user (click to remove)
     transfer-money-no-user-selected: No user select
     transfer-money-search-user: Add user
