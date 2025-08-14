@@ -20,7 +20,7 @@ function detachTransferMoneyMenu() {
   }
 }
 
-function attachTransferMoneyMenu(vdom: Vnode<any>, user: User): void {
+function attachTransferMoneyMenu(vdom: Vnode<any>, _user: User): void {
   const isMobileView = $("#drawer").css('visibility') === "hidden";
   const moneyTransferClient1Customization = app.forum.attribute('moneyTransferClient1Customization');
 

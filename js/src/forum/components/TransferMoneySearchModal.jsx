@@ -5,7 +5,6 @@ import ItemList from 'flarum/common/utils/ItemList';
 import classList from 'flarum/common/utils/classList';
 import extractText from 'flarum/common/utils/extractText';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
-import User from 'flarum/common/models/User';
 import username from 'flarum/common/helpers/username';
 import avatar from 'flarum/common/helpers/avatar';
 
@@ -23,7 +22,7 @@ export default class TransferMoneySearchModal extends Search {
 
     const $search = this;
 
-    this.$('.Search-results').on('click', (e) => {
+    this.$('.Search-results').on('click', () => {
       const target = this.$('.SearchResult.active');
 
       $search.addRecipient(target.data('index'));

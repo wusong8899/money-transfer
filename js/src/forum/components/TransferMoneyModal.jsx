@@ -54,7 +54,7 @@ export default class TransferMoneyModal extends Modal {
 
           <div className="Form-group">
             <label>{app.translator.trans('wusong8899-transfer-money.forum.current-money-amount')}{this.moneyName.replace('[money]', app.session.user.attribute("money"))}</label>
-            <input id="moneyTransferInput" placeholder={app.translator.trans('wusong8899-transfer-money.forum.transfer-money-input-placeholder')} required className="FormControl" type="number" step="any" min="0" oninput={(e) => this.moneyTransferChanged()} />
+            <input id="moneyTransferInput" placeholder={app.translator.trans('wusong8899-transfer-money.forum.transfer-money-input-placeholder')} required className="FormControl" type="number" step="any" min="0" oninput={() => this.moneyTransferChanged()} />
             <div style="padding-top:10px">{app.translator.trans('wusong8899-transfer-money.forum.need-money-amount')}<span id="needMoneyContainer">{this.moneyName.replace('[money]', this.needMoney())}</span></div>
           </div>
 
@@ -148,7 +148,7 @@ export default class TransferMoneyModal extends Modal {
             }
           }
         )
-        .catch((e) => {
+        .catch(() => {
           this.loading = false;
         });
     }

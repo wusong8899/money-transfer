@@ -1,4 +1,3 @@
-import {extend, override} from 'flarum/extend';
 import SettingsPage from './components/SettingsPage';
 
 app.initializers.add('wusong8899-money-transfer', () => {

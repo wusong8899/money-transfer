@@ -16,8 +16,6 @@ export default class TransferHistoryList extends Component {
   }
 
   view() {
-    let loading;
-
     if (this.loading) {
       loading = LoadingIndicator.component({ size: "large" });
     }

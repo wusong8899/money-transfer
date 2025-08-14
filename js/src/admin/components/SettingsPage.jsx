@@ -1,5 +1,4 @@
 import ExtensionPage from 'flarum/components/ExtensionPage';
-import Button from 'flarum/components/Button';
 
 export default class SettingsPage extends ExtensionPage {
   oninit(attrs) {

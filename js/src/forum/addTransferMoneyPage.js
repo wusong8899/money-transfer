@@ -9,7 +9,7 @@ export default function () {
     component: TransferHistoryPage,
   };
 
-  extend(UserPage.prototype, "navItems", function (items,user) {
+  extend(UserPage.prototype, "navItems", function (items) {
       if(app.session.user){
         const currentUserID = app.session.user.id();
         const targetUserID = this.user.id();
