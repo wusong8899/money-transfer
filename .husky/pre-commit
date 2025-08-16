@@ -1,0 +1,20 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running JS checks..."
+cd js || exit
+
+# 运行 Oxlint（限制前 200 行输出，避免太长）
+pnpm oxlint | head -n 200
+
+# 运行构建
+pnpm run build
+
+cd ..
+
+echo "🐘 Running PHP auto-fix..."
+# 先尝试自动修复
+vendor/bin/phpcbf --standard=PSR12 src/
+
+# 再次检查（保证剩下的问题会阻止提交）
+vendor/bin/phpcs --standard=PSR12 src/

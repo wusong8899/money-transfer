@@ -14,8 +14,8 @@ use Flarum\Http\UrlGenerator;
 
 class ListTransferMoneyHistoryController extends AbstractListController
 {
-    public string $serializer = TransferMoneySerializer::class;
-    public array $include = ['fromUser', 'targetUser'];
+    public $serializer = TransferMoneySerializer::class;
+    public $include = ['fromUser', 'targetUser'];
     protected UrlGenerator $url;
 
     public function __construct(UrlGenerator $url)

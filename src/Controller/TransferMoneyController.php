@@ -20,7 +20,7 @@ use Illuminate\Support\Carbon;
 
 class TransferMoneyController extends AbstractCreateController
 {
-    public string $serializer = TransferMoneySerializer::class;
+    public $serializer = TransferMoneySerializer::class;
 
     protected SettingsRepositoryInterface $settings;
     protected NotificationSyncer $notifications;

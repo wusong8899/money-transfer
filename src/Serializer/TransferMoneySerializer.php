@@ -9,7 +9,7 @@ use Flarum\Api\Serializer\BasicUserSerializer;
 
 class TransferMoneySerializer extends AbstractSerializer
 {
-    protected string $type = 'transferMoney';
+    protected $type = 'transferMoney';
 
     protected function getDefaultAttributes($data): array
     {
