@@ -7,16 +7,15 @@
     "dist-typings/**"
   ],
   "categories": {
-    // Be strict about correctness; warn for suspicious patterns in legacy code
     "correctness": "error",
-    "suspicious": "warn"
+    "suspicious": "error",
+    "perf": "error",
+    "style": "error",
+    "restriction": "error"
   },
   "rules": {
-    // Common safety rules
-    "no-debugger": "error",
-    "no-unsafe-finally": "error",
-    // Keep console usage as a warning for now to avoid blocking builds
-    "no-console": "warn"
+    "sort-imports": "off",
+    "sort-keys": "off"
   },
   "overrides": [
     {

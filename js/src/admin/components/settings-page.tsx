@@ -1,11 +1,13 @@
-import ExtensionPage from 'flarum/components/ExtensionPage';
+import app from 'flarum/admin/app';
+import ExtensionPage from 'flarum/admin/components/ExtensionPage';
+import type Mithril from 'mithril';
 
 export default class SettingsPage extends ExtensionPage {
-  oninit(attrs) {
-    super.oninit(attrs);
+  oninit(vnode: Mithril.Vnode<unknown, this>): void {
+    super.oninit(vnode);
   }
 
-  content() {
+  content(): JSX.Element {
     return (
       <div className="ExtensionPage-settings">
         <div className="container">
@@ -13,7 +15,7 @@ export default class SettingsPage extends ExtensionPage {
             type: 'switch',
             setting: 'moneyTransfer.moneyTransferClient1Customization',
             label: app.translator.trans('wusong8899-transfer-money.admin.transfer-money-client-customization'),
-            help:app.translator.trans('wusong8899-transfer-money.admin.transfer-money-client-customization-help')
+            help: app.translator.trans('wusong8899-transfer-money.admin.transfer-money-client-customization-help'),
           })}
 
           {this.buildSettingComponent({
@@ -21,7 +23,7 @@ export default class SettingsPage extends ExtensionPage {
             setting: 'moneyTransfer.moneyTransferTimeZone',
             label: app.translator.trans('wusong8899-transfer-money.admin.transfer-money-timezone'),
             help: app.translator.trans('wusong8899-transfer-money.admin.transfer-money-timezone-help'),
-            placeholder:app.translator.trans('wusong8899-transfer-money.admin.transfer-money-timezone-default')
+            placeholder: app.translator.trans('wusong8899-transfer-money.admin.transfer-money-timezone-default'),
           })}
 
           <div className="Form-group">{this.submitButton()}</div>
@@ -29,5 +31,4 @@ export default class SettingsPage extends ExtensionPage {
       </div>
     );
   }
-
 }

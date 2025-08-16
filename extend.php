@@ -8,9 +8,9 @@ use wusong8899\transferMoney\Controller\TransferMoneyController;
 use wusong8899\transferMoney\Notification\TransferMoneyBlueprint;
 use wusong8899\transferMoney\Serializer\TransferMoneySerializer;
 use wusong8899\transferMoney\Gambits\AllowsPdGambit;
+use wusong8899\transferMoney\Constants\TransferConstants;
 
 use Flarum\User\Search\UserSearcher;
-use Flarum\User\User;
 
 $extend = [
     (new Extend\Frontend('admin'))->js(__DIR__ . '/js/dist/admin.js'),
@@ -18,8 +18,8 @@ $extend = [
     (new Extend\Locales(__DIR__ . '/locale')),
 
     (new Extend\ApiSerializer(ForumSerializer::class))
-        ->attribute('allowUseTranferMoney', function (ForumSerializer $serializer) {
-            return $serializer->getActor()->hasPermission("transferMoney.allowUseTranferMoney");
+        ->attribute('allowUseTransferMoney', function (ForumSerializer $serializer) {
+            return $serializer->getActor()->hasPermission(TransferConstants::PERMISSION_TRANSFER_MONEY);
         }),
     (new Extend\Routes('api'))
         ->post('/transferMoney', 'money.transfer', TransferMoneyController::class)
@@ -31,8 +31,8 @@ $extend = [
         ->addGambit(AllowsPdGambit::class),
 
     (new Extend\Settings())
-        ->serializeToForum('moneyTransferClient1Customization', 'moneyTransfer.moneyTransferClient1Customization')
-        ->serializeToForum('moneyTransferTimeZone', 'moneyTransfer.moneyTransferTimeZone'),
+        ->serializeToForum('moneyTransferClient1Customization', TransferConstants::SETTING_CLIENT_CUSTOMIZATION)
+        ->serializeToForum('moneyTransferTimeZone', TransferConstants::SETTING_TIMEZONE),
 ];
 
 return $extend;

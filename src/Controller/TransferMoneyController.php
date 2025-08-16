@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace wusong8899\transferMoney\Controller;
 
 use wusong8899\transferMoney\Serializer\TransferMoneySerializer;
 use wusong8899\transferMoney\Model\TransferMoney;
 use wusong8899\transferMoney\Notification\TransferMoneyBlueprint;
-
+use wusong8899\transferMoney\Constants\TransferConstants;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\Api\Controller\AbstractCreateController;
 use Flarum\User\User;
@@ -18,19 +20,23 @@ use Illuminate\Support\Carbon;
 
 class TransferMoneyController extends AbstractCreateController
 {
-    public $serializer = TransferMoneySerializer::class;
-    protected $settings;
-    protected $notifications;
-    protected $translator;
+    public string $serializer = TransferMoneySerializer::class;
 
-    public function __construct(NotificationSyncer $notifications, Translator $translator, SettingsRepositoryInterface $settings)
-    {
+    protected SettingsRepositoryInterface $settings;
+    protected NotificationSyncer $notifications;
+    protected Translator $translator;
+
+    public function __construct(
+        NotificationSyncer $notifications,
+        Translator $translator,
+        SettingsRepositoryInterface $settings
+    ) {
         $this->settings = $settings;
         $this->notifications = $notifications;
         $this->translator = $translator;
     }
 
-    protected function data(ServerRequestInterface $request, Document $document)
+    protected function data(ServerRequestInterface $request, Document $document): User
     {
         $requestData = $request->getParsedBody()['data']['attributes'];
         $moneyTransfer = floatval($requestData['moneyTransfer']);
@@ -40,25 +46,35 @@ class TransferMoneyController extends AbstractCreateController
         $currentUserID = $request->getAttribute('actor')->id;
         $errorMessage = "";
 
-        if (!isset($moneyTransfer) || array_search($currentUserID, $selectedUsers) !== false || $moneyTransfer <= 0 || $moneyTransferTotalUser === 0) {
-            $errorMessage = 'wusong8899-transfer-money.forum.transfer-error';
+        if (
+            !isset($moneyTransfer) ||
+            array_search($currentUserID, $selectedUsers) !== false ||
+            $moneyTransfer <= TransferConstants::MIN_TRANSFER_AMOUNT ||
+            $moneyTransferTotalUser === TransferConstants::MIN_USER_COUNT
+        ) {
+            $errorMessage = TransferConstants::ERROR_GENERAL;
         } else {
             $currentUserData = User::find($currentUserID);
-            $allowUseTranferMoney = $request->getAttribute('actor')->can('transferMoney.allowUseTranferMoney', $currentUserData);
+            $allowUseTransferMoney = $request->getAttribute('actor')->can(
+                TransferConstants::PERMISSION_TRANSFER_MONEY,
+                $currentUserData
+            );
 
-            if ($allowUseTranferMoney) {
+            if ($allowUseTransferMoney) {
                 $currentUserMoneyRemain = $currentUserData->money - ($moneyTransfer * $moneyTransferTotalUser);
                 $selectedUsersDataCount = User::find($selectedUsers)->count();
 
                 if ($selectedUsersDataCount === $moneyTransferTotalUser) {
-                    if ($currentUserMoneyRemain < 0) {
-                        $errorMessage = 'wusong8899-transfer-money.forum.transfer-error-insufficient-fund';
+                    if ($currentUserMoneyRemain < TransferConstants::MIN_TRANSFER_AMOUNT) {
+                        $errorMessage = TransferConstants::ERROR_INSUFFICIENT_FUND;
                     } else {
-                        $defaultTimezone = 'Asia/Shanghai';
-                        $settingTimezone = $this->settings->get('moneyTransfer.moneyTransferTimeZone', $defaultTimezone);
+                        $settingTimezone = $this->settings->get(
+                            TransferConstants::SETTING_TIMEZONE,
+                            TransferConstants::DEFAULT_TIMEZONE
+                        );
 
                         if (!in_array($settingTimezone, timezone_identifiers_list())) {
-                            $settingTimezone = $defaultTimezone;
+                            $settingTimezone = TransferConstants::DEFAULT_TIMEZONE;
                         }
 
                         $currentUserData->money = $currentUserMoneyRemain;
@@ -87,15 +103,18 @@ class TransferMoneyController extends AbstractCreateController
                         return $currentUserData;
                     }
                 } else {
-                    $errorMessage = 'wusong8899-transfer-money.forum.transfer-error';
+                    $errorMessage = TransferConstants::ERROR_GENERAL;
                 }
             } else {
-                $errorMessage = 'wusong8899-transfer-money.forum.transfer-error-no-permission';
+                $errorMessage = TransferConstants::ERROR_NO_PERMISSION;
             }
         }
 
         if ($errorMessage !== "") {
             throw new ValidationException(['message' => $this->translator->trans($errorMessage)]);
         }
+
+        // This should never be reached due to the validation above
+        throw new ValidationException(['message' => 'Unexpected error occurred']);
     }
 }

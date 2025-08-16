@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace wusong8899\transferMoney\Serializer;
 
 use Flarum\Api\Serializer\AbstractSerializer;
@@ -7,20 +9,18 @@ use Flarum\Api\Serializer\BasicUserSerializer;
 
 class TransferMoneySerializer extends AbstractSerializer
 {
-    protected $type = 'transferMoney';
+    protected string $type = 'transferMoney';
 
-    protected function getDefaultAttributes($data)
+    protected function getDefaultAttributes($data): array
     {
-        $attributes = [
+        return [
             'id' => $data->id,
             'from_user_id' => $data->from_user_id,
             'notes' => $data->notes,
             'target_user_id' => $data->target_user_id,
             'transfer_money_value' => $data->transfer_money_value,
-            'assigned_at' => date("Y-m-d H:i:s", strtotime($data->assigned_at))
+            'assigned_at' => $data->assigned_at?->format('Y-m-d H:i:s')
         ];
-
-        return $attributes;
     }
 
     protected function fromUser($transferHistory)

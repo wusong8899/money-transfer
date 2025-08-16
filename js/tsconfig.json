@@ -1,5 +1,5 @@
 {
-  "extends": "flarum-tsconfig",
+  "extends": "./node_modules/flarum-tsconfig/tsconfig.json",
   "include": [
     "src/**/*"
   ],

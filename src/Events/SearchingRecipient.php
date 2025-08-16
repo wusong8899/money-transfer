@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of fof/byobu.
  *
@@ -15,25 +17,10 @@ use Flarum\Search\SearchState;
 
 class SearchingRecipient
 {
-    /**
-     * @var SearchState
-     */
-    public $search;
-
-    /**
-     * @var array
-     */
-    public $matches;
-
-    /**
-     * @var bool
-     */
-    public $negate;
-
-    public function __construct(SearchState $search, array $matches, $negate)
-    {
-        $this->search = $search;
-        $this->matches = $matches;
-        $this->negate = $negate;
+    public function __construct(
+        public readonly SearchState $search,
+        public readonly array $matches,
+        public readonly bool $negate
+    ) {
     }
 }

@@ -3,20 +3,20 @@ import path from 'node:path';
 import oxlintPlugin from 'vite-plugin-oxlint';
 
 // Custom plugin to handle Flarum's module.exports assignment pattern
-function flarumModuleExports() {
-  return {
-    name: 'flarum-module-exports',
-    generateBundle(options: any, bundle: any) {
-      for (const fileName in bundle) {
-        const chunk = bundle[fileName];
+const flarumModuleExports = (): { name: string; generateBundle: (options: unknown, bundle: Record<string, unknown>) => void } => ({
+  name: 'flarum-module-exports',
+  generateBundle(options: unknown, bundle: Record<string, unknown>): void {
+    for (const fileName in bundle) {
+      if (Object.hasOwn(bundle, fileName)) {
+        const chunk = bundle[fileName] as { type: string; isEntry: boolean; code: string };
         if (chunk.type === 'chunk' && chunk.isEntry) {
           // Add module.exports={} at the end like webpack does
-          chunk.code = chunk.code + '\nmodule.exports={};';
+          chunk.code += '\nmodule.exports={};';
         }
       }
-    },
-  };
-}
+    }
+  },
+});
 
 export default defineConfig({
   root: path.resolve(__dirname),
@@ -42,10 +42,18 @@ export default defineConfig({
         admin: path.resolve(__dirname, 'admin.js'),
       },
       external: (id: string) => {
-        if (id === '@flarum/core/admin' || id === '@flarum/core/forum') return true;
-        if (id === 'jquery') return true;
-        if (id === 'mithril') return true; // mithril is provided by Flarum core
-        if (id.startsWith('flarum/')) return true; // legacy compat modules
+        if (id === '@flarum/core/admin' || id === '@flarum/core/forum') {
+          return true;
+        }
+        if (id === 'jquery') {
+          return true;
+        }
+        if (id === 'mithril') {
+          return true; // mithril is provided by Flarum core
+        }
+        if (id.startsWith('flarum/')) {
+          return true; // legacy compat modules
+        }
         return false;
       },
       output: {
@@ -53,11 +61,20 @@ export default defineConfig({
         inlineDynamicImports: true,
         entryFileNames: '[name].js',
         globals: (id: string) => {
-          if (id === '@flarum/core/admin' || id === '@flarum/core/forum') return 'flarum.core';
-          if (id === 'jquery') return 'jQuery';
-          if (id === 'mithril') return 'm';
+          if (id === '@flarum/core/admin' || id === '@flarum/core/forum') {
+            return 'flarum.core';
+          }
+          if (id === 'jquery') {
+            return 'jQuery';
+          }
+          if (id === 'mithril') {
+            return 'm';
+          }
           const compat = id.match(/^flarum\/(.+)$/);
-          if (compat) return `flarum.core.compat['${compat[1]}']`;
+          const COMPAT_INDEX = 1;
+          if (compat) {
+            return `flarum.core.compat['${compat[COMPAT_INDEX]}']`;
+          }
           return id;
         },
       },

@@ -1,41 +1,51 @@
 import { extend } from "flarum/extend";
 import SessionDropdown from 'flarum/forum/components/SessionDropdown';
-import TransferMoneyModal from './components/TransferMoneyModal';
+import TransferMoneyModal from './components/transfer-money-modal';
+import type { Vnode } from 'mithril';
+import type User from 'flarum/common/models/User';
+import app from 'flarum/forum/app';
+import {
+  CSS_DISPLAY_NONE,
+  CSS_VISIBILITY_HIDDEN,
+  ROUTE_TAGS,
+  CUSTOMIZATION_ENABLED
+} from './constants';
 
-const checkTime = 10;
+const CHECK_TIME_INTERVAL = 10;
+const MIN_ITEM_COUNT = 0;
 
-function detachTransferMoneyMenu() {
+const detachTransferMoneyMenu = (): void => {
   const moneyTransferClient1Customization = app.forum.attribute('moneyTransferClient1Customization');
 
-  if (moneyTransferClient1Customization !== '1') {
+  if (moneyTransferClient1Customization !== CUSTOMIZATION_ENABLED) {
     return;
   }
 
-  let transferMoneyLabelContainer = document.getElementById("transferMoneyLabelContainer");
+  const transferMoneyLabelContainer = document.getElementById("transferMoneyLabelContainer");
 
   if (transferMoneyLabelContainer !== null) {
     $(transferMoneyLabelContainer).remove();
     // $("#app-navigation").css("height","var(--header-height-phone)");
     // $("#content .container .IndexPage-results").css("marginTop","15px");
   }
-}
+};
 
-function attachTransferMoneyMenu(vdom: Vnode<any>, _user: User): void {
-  const isMobileView = $("#drawer").css('visibility') === "hidden";
+const attachTransferMoneyMenu = (vdom: Vnode<unknown>, _user: User): void => {
+  const isMobileView = $("#drawer").css('visibility') === CSS_VISIBILITY_HIDDEN;
   const moneyTransferClient1Customization = app.forum.attribute('moneyTransferClient1Customization');
 
   if (isMobileView === false) { return; }
-  if (moneyTransferClient1Customization !== '1') { return; }
+  if (moneyTransferClient1Customization !== CUSTOMIZATION_ENABLED) { return; }
 
-  $("#content .IndexPage-nav .item-nav").css("display", "none");
+  $("#content .IndexPage-nav .item-nav").css("display", CSS_DISPLAY_NONE);
   $("#content .IndexPage-nav .item-newDiscussion").remove();
 
-  let task = setInterval(function () {
+  const task = setInterval(function checkDomReady(): void {
     if (vdom.dom) {
       clearInterval(task);
 
-      if (vdom.dom !== undefined) {
-        $("#content .IndexPage-nav .item-nav").css("display", "none");
+      if (vdom.dom) {
+        $("#content .IndexPage-nav .item-nav").css("display", CSS_DISPLAY_NONE);
         $("#content .IndexPage-nav .item-newDiscussion").remove();
 
         let transferMoneyLabelContainer = document.getElementById("transferMoneyLabelContainer");
@@ -48,7 +58,7 @@ function attachTransferMoneyMenu(vdom: Vnode<any>, _user: User): void {
         $("#content .IndexPage-nav .item-nav .ButtonGroup button").addClass("Button--link");
         let itemNav = $("#content .IndexPage-nav .item-nav").clone();
 
-        if (itemNav.length > 0) {
+        if (itemNav.length > MIN_ITEM_COUNT) {
           $("#itemNavClone").remove();
           $(itemNav).attr('id', "itemNavClone");
           $(itemNav).css('display', "");
@@ -81,7 +91,7 @@ function attachTransferMoneyMenu(vdom: Vnode<any>, _user: User): void {
         transferMoneyButtonText.innerHTML = app.translator.trans('wusong8899-transfer-money.forum.withdrawal');
         transferMoneyButtonText.className = "clientCustomizeWithdrawalHeaderItems clientCustomizeWithdrawalHeaderWithdrawal";
 
-        $(transferMoneyButtonText).click(function () {
+        $(transferMoneyButtonText).click(function showTransferModal(): void {
           app.modal.show(TransferMoneyModal);
         });
 
@@ -95,8 +105,12 @@ function attachTransferMoneyMenu(vdom: Vnode<any>, _user: User): void {
         $(userAvatarContainer).html(avatarClone);
 
         let hideNavToggle = "";
-        $(avatarClone).on('click', function () {
-          hideNavToggle = hideNavToggle === "" ? "none" : "";
+        $(avatarClone).on('click', function toggleNavigation(): void {
+          if (hideNavToggle === "") {
+            hideNavToggle = CSS_DISPLAY_NONE;
+          } else {
+            hideNavToggle = "";
+          }
           $("#content .IndexPage-nav").css("display", hideNavToggle);
         });
 
@@ -106,11 +120,11 @@ function attachTransferMoneyMenu(vdom: Vnode<any>, _user: User): void {
         appNavigation.appendChild(transferMoneyLabelContainer);
       }
     }
-  }, checkTime);
-}
+  }, CHECK_TIME_INTERVAL);
+};
 
-export default function () {
-  extend(SessionDropdown.prototype, 'view', function (vnode) {
+const addClient1CustomizationFeatures = (): void => {
+  extend(SessionDropdown.prototype, 'view', function handleSessionDropdownView(vnode): void {
     if (!app.session.user) {
       return;
     }
@@ -118,11 +132,13 @@ export default function () {
     const routeName = app.current.get('routeName');
 
     if (routeName) {
-      if (routeName !== "tags") {
+      if (routeName !== ROUTE_TAGS) {
         detachTransferMoneyMenu();
       } else {
         attachTransferMoneyMenu(vnode, this.attrs.user);
       }
     }
   });
-}
+};
+
+export default addClient1CustomizationFeatures;
