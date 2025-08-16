@@ -37,32 +37,36 @@ export default class TransferMoneySearchModal extends Search<TransferMoneySearch
   oncreate(vnode: Mithril.VnodeDOM<TransferMoneySearchModalAttrs, this>): void {
     super.oncreate(vnode);
 
-    this.$('.Search-results').on('click', () => {
-      const target = this.$('.SearchResult.active');
-      this.addRecipient(target.data('index') as string);
-      this.$('.RecipientsInput').focus();
-    });
-
-    this.$('.Search-results').on('touchstart', (event: TouchEvent) => {
-      const target = this.$(event.target as Element).parent();
-      this.addRecipient(target.data('index') as string);
-      this.$('.RecipientsInput').focus();
-    });
-
-    (globalThis as { jquery: (selector: string) => JQuery }).jquery('.RecipientsInput')
-      .on('input', () => {
-        clearTimeout(this.typingTimer);
-        this.doSearch = false;
-        this.typingTimer = globalThis.setTimeout(() => {
-          this.doSearch = true;
-          m.redraw();
-        }, SEARCH_TYPING_DELAY);
-      })
-      .on('keydown', () => {
-        clearTimeout(this.typingTimer);
+    // Safely access jQuery through the component's $ method
+    try {
+      this.$('.Search-results').on('click', () => {
+        const target = this.$('.SearchResult.active');
+        this.addRecipient(target.data('index') as string);
+        this.$('.RecipientsInput').focus();
       });
 
-    super.oncreate(vnode);
+      this.$('.Search-results').on('touchstart', (event: TouchEvent) => {
+        const target = this.$(event.target as Element).parent();
+        this.addRecipient(target.data('index') as string);
+        this.$('.RecipientsInput').focus();
+      });
+
+      // Use the component's $ method instead of globalThis.jquery
+      this.$('.RecipientsInput')
+        .on('input', () => {
+          clearTimeout(this.typingTimer);
+          this.doSearch = false;
+          this.typingTimer = globalThis.setTimeout(() => {
+            this.doSearch = true;
+            m.redraw();
+          }, SEARCH_TYPING_DELAY);
+        })
+        .on('keydown', () => {
+          clearTimeout(this.typingTimer);
+        });
+    } catch {
+      // Silently handle jQuery setup errors
+    }
   }
 
   view(): Mithril.Children {
