@@ -3,7 +3,7 @@ import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import SearchState from 'flarum/forum/states/SearchState';
 import ItemList from 'flarum/common/utils/ItemList';
-import Stream from 'flarum/common/utils/Stream';
+import Stream, { type Stream as StreamType } from 'flarum/common/utils/Stream';
 import Alert from 'flarum/common/components/Alert';
 import type Mithril from 'mithril';
 
@@ -27,15 +27,16 @@ import {
 export default class TransferMoneyModal extends Modal<TransferMoneyModalAttrs> {
   static isDismissible = false;
 
-  private selected!: Stream<ItemList<unknown>>;
+  private selected!: StreamType<ItemList<unknown>>;
   private selectedUsers!: Record<string, number>;
   private moneyName!: string;
   private recipientSearch!: SearchState;
-  private needMoney!: Stream<number>;
+  private needMoney!: StreamType<number>;
 
   oninit(vnode: Mithril.Vnode<TransferMoneyModalAttrs, this>): void {
     super.oninit(vnode);
-    this.selected = Stream.of(new ItemList());
+    // eslint-disable-next-line new-cap
+    this.selected = Stream(new ItemList());
     this.selectedUsers = {};
     this.moneyName = app.forum.attribute(MONEY_ATTRIBUTE_KEY) as string || DEFAULT_MONEY_NAME;
 
@@ -46,7 +47,8 @@ export default class TransferMoneyModal extends Modal<TransferMoneyModalAttrs> {
     }
 
     this.recipientSearch = new SearchState();
-    this.needMoney = Stream.of(DEFAULT_MONEY_AMOUNT);
+    // eslint-disable-next-line new-cap
+    this.needMoney = Stream(DEFAULT_MONEY_AMOUNT);
   }
 
   className(): string {
